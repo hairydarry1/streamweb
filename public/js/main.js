@@ -247,5 +247,55 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+  /* ================================
+     TOUCH INTERACTIONS FOR MOBILE
+  ================================ */
+  let startX = 0;
+  let currentX = 0;
+  let isDragging = false;
+
+  track.addEventListener('touchstart', e => {
+    isDragging = true;
+    startX = e.touches[0].clientX;
+  });
+
+  track.addEventListener('touchmove', e => {
+    if(!isDragging) return;
+    currentX = e.touches[0].clientX;
+    let diff = currentX - startX;
+    track.style.transform = `translateX(${x + diff}px)`;
+  });
+
+  track.addEventListener('touchend', e => {
+    x += currentX - startX;
+    isDragging = false;
+  });
+
+  /* ================================
+     SKELETON MOBILE TOUCH
+  ================================ */
+  document.addEventListener("touchmove", e => {
+    const touch = e.touches[0];
+    const skeletonRect = skeleton.getBoundingClientRect();
+    const centerX = skeletonRect.left + skeletonRect.width / 2;
+    const centerY = skeletonRect.top + skeletonRect.height / 4;
+    const dx = touch.clientX - centerX;
+    const dy = touch.clientY - centerY;
+    const maxOffset = 5;
+    const angle = Math.atan2(dy, dx);
+    const offsetX = Math.cos(angle) * maxOffset;
+    const offsetY = Math.sin(angle) * maxOffset;
+    leftEye.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+    rightEye.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+  });
+
+  skeleton.addEventListener("touchstart", ()=>{
+    skeleton.classList.add("wave");
+    speech.style.opacity = "1";
+    setTimeout(()=>{
+      skeleton.classList.remove("wave");
+      speech.style.opacity = "0";
+    }, 2000);
+  });
 
 });
